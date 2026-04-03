@@ -1,0 +1,12 @@
+All the network commands used here
+
+=========== NETWORK COMMANDS ===========
+1. PING => "PONG"
+
+
+
+
+
+=========== HASH MAP ============
+1. SET [key] [Value] => "OK"
+2. GET [KEY] => "value"

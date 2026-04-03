@@ -1,5 +1,8 @@
 use tokio::net::TcpListener;
+mod commands;
 mod server;
+mod store;
+use crate::store::Db;
 use server::handle_connection;
 
 #[tokio::main]
@@ -12,6 +15,8 @@ async fn main() {
         }
     };
 
+    let db: Db = store::create_db();
+
     println!("Server running on 8080");
     println!("Waiting for connections...");
 
@@ -19,7 +24,8 @@ async fn main() {
         match listener.accept().await {
             Ok((socket, addr)) => {
                 println!("client connected {}", addr);
-                tokio::spawn(handle_connection(socket, addr));
+                let db_clone = db.clone();
+                tokio::spawn(async move { handle_connection(socket, addr, &db_clone).await });
             }
             Err(e) => {
                 eprintln!("Failed to accept connection: {}", e);
