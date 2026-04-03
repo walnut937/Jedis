@@ -1,0 +1,66 @@
+// Roadmap Phase =======================================
+
+Phase 0 — Done ✓
+• TcpListener — accepting connections
+• tokio::spawn — concurrent clients
+• Arc + Mutex + HashMap — shared in-memory store
+
+
+Phase 1 — Core commands
+• SET key value — store a value
+• GET key — retrieve a value
+• DEL key — delete a value
+• EXISTS key — check if key exists
+• -> working server, testable with nc
+
+
+
+Phase 2 — RESP protocol
+• Parse incoming RESP format from clients
+• Respond in RESP format
+• Any Redis client library now works (Node, Python, Java)
+• Test with redis-cli pointing to your server
+• -> compatible with redis-cli, Node.js, Python, Java — any Redis client in any language just works
+
+
+Phase 3 — TTL (expiry)
+• SET key value EX 60 — expires in 60 seconds
+• Store expiry timestamp alongside value
+• Background task checks and deletes expired keys
+• EXPIRE key seconds — set TTL on existing key
+• -> sessions, caching, rate limiting all become possible — this is why Redis is used for auth tokens
+
+
+Phase 4 — More data types
+• Lists — LPUSH, RPUSH, LRANGE
+• Sets — SADD, SMEMBERS, SISMEMBER
+• Counters — INCR, DECR
+• HashMap becomes HashMap of enums to support all types
+• -> now you support real use cases like leaderboards (sorted sets), queues (lists), unique visitors (sets)
+
+
+Phase 5 — Persistence
+• AOF (Append Only File) — log every write command to disk
+• On startup replay the log to restore state
+• Snapshot — dump entire HashMap to disk periodically
+• Data now survives server restarts
+• This is what Redis RDB and AOF files are
+• -> data survives restarts — now it's a real database not just a cache
+
+
+
+// The data flow will look like this ======================================
+
+client sends "SET name Aditya"
+        ↓
+resp.rs parses RESP bytes → ["SET", "name", "Aditya"]
+        ↓
+command.rs pattern matches → Command::Set { key, value }
+        ↓
+store.rs grabs Mutex lock → HashMap.insert("name", "Aditya")
+        ↓
+persistence.rs logs to AOF file → "SET name Aditya\n"
+        ↓
+resp.rs formats response → "+OK\r\n"
+        ↓
+client receives "OK"

@@ -1,5 +1,6 @@
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
+mod server;
+use server::handle_connection;
 
 #[tokio::main]
 async fn main() {
@@ -11,37 +12,14 @@ async fn main() {
         }
     };
 
+    println!("Server running on 8080");
+    println!("Waiting for connections...");
+
     loop {
         match listener.accept().await {
-            Ok((mut socket, addr)) => {
-                println!("Client connected {}", addr);
-                tokio::spawn(async move {
-                    let mut buffer = vec![0; 1024];
-
-                    let n = match socket.read(&mut buffer).await {
-                        Ok(0) => {
-                            println!("client disconnected {}", addr);
-                            return;
-                        }
-                        Ok(n) => n,
-                        Err(e) => {
-                            println!("Failed to read from {}: {}", addr, e);
-                            return;
-                        }
-                    };
-                    let message = String::from_utf8_lossy(&buffer[..n]).trim().to_string();
-                    println!("{} says: {}", addr, message);
-
-                    let response = if message == "PING" {
-                        "PONG\n"
-                    } else {
-                        "UNKNOWN\n"
-                    };
-
-                    if let Err(e) = socket.write_all(response.as_bytes()).await {
-                        eprintln!("Failed to write to {}: {}", addr, e);
-                    }
-                });
+            Ok((socket, addr)) => {
+                println!("client connected {}", addr);
+                tokio::spawn(handle_connection(socket, addr));
             }
             Err(e) => {
                 eprintln!("Failed to accept connection: {}", e);
