@@ -14,7 +14,6 @@ Phase 1 — Core commands
 • -> working server, testable with nc
 
 
-
 Phase 2 — RESP protocol
 • Parse incoming RESP format from clients
 • Respond in RESP format

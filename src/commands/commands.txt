@@ -7,6 +7,6 @@ All the network commands used here
 
 
 
-=========== HASH MAP ============
+=========== STRINGs ============
 1. SET [KEY] [VALUE] => "OK"
 2. GET [KEY] => "value"
