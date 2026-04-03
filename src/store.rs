@@ -17,3 +17,13 @@ pub async fn get_values(db: &Db, key: &str) -> Option<String> {
     let map = db.lock().await;
     map.get(key).cloned()
 }
+
+pub async fn delete_values(db: &Db, key: &str) -> Option<String> {
+    let mut map = db.lock().await;
+    map.remove(key)
+}
+
+pub async fn exist_key(db: &Db, key: &str) -> bool {
+    let map = db.lock().await;
+    map.contains_key(key)
+}

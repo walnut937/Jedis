@@ -10,22 +10,25 @@ pub async fn handle_connection(socket: TcpStream, addr: std::net::SocketAddr, db
     let mut line = String::new();
 
     loop {
-        line.clear();
+        if let Err(e) = writer.write_all(b"redis > ").await {
+            eprintln!("Failed to write prompt to {}: {}", addr, e);
+            return;
+        }
 
+        line.clear();
         match reader.read_line(&mut line).await {
             Ok(0) => {
                 println!("client disconnected {}", addr);
                 return;
             }
-            Ok(n) => n,
+            Ok(_) => {}
             Err(e) => {
-                println!("Failed to read form {}: {}", addr, e);
+                println!("Failed to read from {}: {}", addr, e);
                 return;
             }
         };
 
         let message = line.trim();
-
         let parts: Vec<&str> = message.split_whitespace().collect();
 
         if parts.is_empty() {
@@ -36,6 +39,7 @@ pub async fn handle_connection(socket: TcpStream, addr: std::net::SocketAddr, db
 
         let response = execute_commands(&parts, db).await;
 
+        // send response + newline
         if let Err(e) = writer.write_all(response.as_bytes()).await {
             eprintln!("Failed to write to {}: {}", addr, e);
             return;

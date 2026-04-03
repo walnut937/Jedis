@@ -1,5 +1,5 @@
 use crate::store::Db;
-use crate::store::{get_values, store_values};
+use crate::store::{delete_values, exist_key, get_values, store_values};
 
 pub async fn execute_commands(parts: &[&str], db: &Db) -> String {
     let command = parts[0];
@@ -26,6 +26,29 @@ pub async fn execute_commands(parts: &[&str], db: &Db) -> String {
                 None => "No value exist\n".to_string(),
             }
         }
-        _ => "UNKNOWN\n".to_string(),
+        "DEL" => {
+            if parts.len() != 2 {
+                return "ERR usage: No value to delete\n".to_string();
+            }
+            let key = parts[1];
+            let result = delete_values(db, key).await;
+            match result {
+                Some(_) => "OK\n".to_string(),
+                None => "Err no such key found\n".to_string(),
+            }
+        }
+        "EXISTS" => {
+            if parts.len() != 2 {
+                return "Err usage: No exist key\n".to_string();
+            }
+            let key = parts[1];
+            let exists = exist_key(db, key).await;
+            if exists {
+                "1\n".to_string()
+            } else {
+                "0\n".to_string()
+            }
+        }
+        _ => format!("unknown command '{}'\n", parts[0]).to_string(),
     }
 }
