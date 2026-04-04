@@ -10,7 +10,7 @@ pub async fn handle_connection(socket: TcpStream, addr: std::net::SocketAddr, db
     let mut line = String::new();
 
     loop {
-        if let Err(e) = writer.write_all(b"redis > ").await {
+        if let Err(e) = writer.write_all(b"Jedis > ").await {
             eprintln!("Failed to write prompt to {}: {}", addr, e);
             return;
         }

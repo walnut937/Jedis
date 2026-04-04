@@ -1,7 +1,9 @@
 use tokio::net::TcpListener;
+mod background;
 mod commands;
 mod server;
 mod store;
+use crate::background::expire_type;
 use crate::store::Db;
 use server::handle_connection;
 
@@ -16,6 +18,8 @@ async fn main() {
     };
 
     let db: Db = store::create_db();
+
+    tokio::spawn(expire_type::active_expiry(db.clone()));
 
     println!("Server running on 8080");
     println!("Waiting for connections...");

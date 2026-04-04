@@ -19,4 +19,4 @@ All the network commands used here
 1. HSET [KEY] [FIELD] [VALUE] Optional(EX [TIME]) => "OK" -> Working
 2. HGET [KEY] [FIELD] -> Working
 3. HDEL [KEY] [FIELD] -> Working
-4. HTTL [KEY] [FIELD] > Not Working
+4. HTTL [KEY] -> Working

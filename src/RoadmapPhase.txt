@@ -6,7 +6,7 @@ Phase 0 — Done ✓
 • Arc + Mutex + HashMap — shared in-memory store
 
 
-Phase 1 — Core commands
+Phase 1 — Core commands ✓
 • SET key value — store a value
 • GET key — retrieve a value
 • DEL key — delete a value
