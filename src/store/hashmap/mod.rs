@@ -1,2 +1,2 @@
 pub mod hashmap;
-pub use hashmap::{hdel, hget, hset};
+pub use hashmap::{hdel, hget, hset, httl};

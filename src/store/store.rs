@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::sync::Arc;
+use std::time::Instant;
 use tokio::sync::Mutex;
 
 pub enum RedisValue {
@@ -10,6 +11,16 @@ pub enum RedisValue {
 
 pub struct Entry {
     pub value: RedisValue,
+    pub expires_at: Option<Instant>,
+}
+
+impl Entry {
+    pub fn is_expired(&self) -> bool {
+        match self.expires_at {
+            Some(expiry) => Instant::now() > expiry,
+            None => false,
+        }
+    }
 }
 
 pub type Db = Arc<Mutex<HashMap<String, Entry>>>;

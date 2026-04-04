@@ -8,5 +8,15 @@ All the network commands used here
 
 
 =========== STRINGs ============
-1. SET [KEY] [VALUE] => "OK"
-2. GET [KEY] => "value"
+1. SET [KEY] [VALUE] Optional(EX [TIME]) => "OK" -> Working
+2. GET [KEY] => "value" | "nil" -> Working
+3. DEL [KEY] => "OK" | "nil" -> Working
+4. TTL [KEY] => Time remaining | "nil" -> Working
+
+
+
+=========== HashMap ============
+1. HSET [KEY] [FIELD] [VALUE] Optional(EX [TIME]) => "OK" -> Working
+2. HGET [KEY] [FIELD] -> Working
+3. HDEL [KEY] [FIELD] -> Working
+4. HTTL [KEY] [FIELD] > Not Working

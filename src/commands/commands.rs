@@ -8,9 +8,9 @@ pub async fn execute_commands(parts: &[&str], db: &Db) -> String {
         // General
         "PING" => "PONG\n".to_string(),
         // Strings
-        "SET" | "GET" | "DEL" | "EXISTS" => string::handle(parts, db).await,
+        "SET" | "GET" | "DEL" | "EXISTS" | "TTL" => string::handle(parts, db).await,
         // Hash Map
-        "HSET" | "HGET" | "HDEL" => hashmap::handle(parts, db).await,
+        "HSET" | "HGET" | "HDEL" | "HTTL" => hashmap::handle(parts, db).await,
         _ => format!("Unknown command {}\n", parts[0]).to_string(),
     }
 }

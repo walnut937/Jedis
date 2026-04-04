@@ -39,7 +39,6 @@ pub async fn handle_connection(socket: TcpStream, addr: std::net::SocketAddr, db
 
         let response = execute_commands(&parts, db).await;
 
-        // send response + newline
         if let Err(e) = writer.write_all(response.as_bytes()).await {
             eprintln!("Failed to write to {}: {}", addr, e);
             return;
