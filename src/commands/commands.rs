@@ -1,12 +1,13 @@
 use crate::commands::hashmap;
+use crate::commands::server;
 use crate::commands::string;
 use crate::store::Db;
 
 pub async fn execute_commands(parts: &[&str], db: &Db) -> String {
     let command = parts[0];
     match command {
-        // General
-        "PING" => "PONG\n".to_string(),
+        // Server
+        "PING" | "ECHO" | "DBSIZE" => server::handle(parts, db).await,
         // Strings
         "SET" | "GET" | "DEL" | "EXISTS" | "TTL" => string::handle(parts, db).await,
         // Hash Map

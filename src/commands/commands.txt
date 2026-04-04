@@ -1,22 +1,30 @@
 All the network commands used here
 
-=========== NETWORK COMMANDS ===========
-1. PING => "PONG"
-
-
-
+=========== NETWORK / SERVER COMMANDS ===========
+1. PING => "PONG" ✓
+2. ECHO [TEXT] => "TEXT"
+3. DBSIZE => Integer
+4. FLUSHDB => clears the db
+5. TYPE [TEXT] => "String"
+6. KEYS => returns all the keys
 
 
 =========== STRINGs ============
-1. SET [KEY] [VALUE] Optional(EX [TIME]) => "OK" -> Working
-2. GET [KEY] => "value" | "nil" -> Working
-3. DEL [KEY] => "OK" | "nil" -> Working
-4. TTL [KEY] => Time remaining | "nil" -> Working
-
+1. SET [KEY] [VALUE] Optional(EX [TIME]) => "OK" ✓
+2. GET [KEY] => "value" | "nil" ✓
+3. DEL [KEY] => "OK" | "nil" ✓
+4. TTL [KEY] => Time remaining | "nil" ✓
 
 
 =========== HashMap ============
-1. HSET [KEY] [FIELD] [VALUE] Optional(EX [TIME]) => "OK" -> Working
-2. HGET [KEY] [FIELD] -> Working
-3. HDEL [KEY] [FIELD] -> Working
-4. HTTL [KEY] -> Working
+1. HSET [KEY] [FIELD] [VALUE] Optional(EX [TIME]) => "OK" ✓
+2. HGET [KEY] [FIELD] ✓
+3. HDEL [KEY] [FIELD] v
+4. HTTL [KEY] ✓
+
+
+=========== COUNTERS ============
+1. INCR []
+2. DECR []
+3. INCRBY []
+4. DECRBY []

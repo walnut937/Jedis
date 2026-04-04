@@ -6,7 +6,7 @@ use tokio::sync::Mutex;
 pub enum RedisValue {
     String(String),
     Hash(HashMap<String, String>),
-    _List(Vec<String>),
+    // _List(Vec<String>),
 }
 
 pub struct Entry {
