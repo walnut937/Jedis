@@ -28,8 +28,8 @@ There are few features which will be added in future all of them haven't been in
 ### Core Components
 
 - **`server.rs`**: Main entry point with TCP server and connection handling
-- **`commands/commands.rs`**: Implementation of all Redis commands
-- **`utils/mod.rs`**: Utility functions, data structures, and protocol encoding/decoding
+- **`commands/mod.rs`**: Implementation of all Redis commands
+<!--- **`utils/mod.rs`**: Utility functions, data structures, and protocol encoding/decoding-->
 - **Integration Tests**: Comprehensive test suite
 
 ### Data Structures
@@ -52,7 +52,7 @@ pub struct Entry {
 
 - Rust 1.90+ 
 - Tokio runtime
-- Dependencies: `clap`, `bytes`, `crc64`, `hex`, `rand`
+- Dependencies: `rand`, `tokio`
 
 ### Installation
 
