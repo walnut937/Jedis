@@ -8,6 +8,8 @@ use crate::background::expire_type;
 use crate::store::{Db, Stats};
 use config::Config;
 use server::handle_connection;
+use std::sync::Arc;
+use tokio::sync::broadcast;
 
 #[tokio::main]
 async fn main() {
@@ -25,11 +27,15 @@ async fn main() {
 
     let db: Db = store::create_db();
     let stats: Stats = store::create_stats();
+    let (moniter_tx, _) = broadcast::channel::<String>(100);
+    let moniter_tx = Arc::new(moniter_tx);
 
     tokio::spawn(expire_type::active_expiry(db.clone(), stats.clone()));
 
-    println!("Server running on 8080");
+    println!("Server running on {}", config.port);
     println!("Waiting for connections...");
+    println!("\n\"");
+    println!("\n\"");
 
     loop {
         match listener.accept().await {
@@ -37,10 +43,18 @@ async fn main() {
                 println!("client connected {}", addr);
                 let db_clone = db.clone();
                 let stats_clone = stats.clone();
+                let moniter_clone = moniter_tx.clone();
                 stats.increment_connections();
                 tokio::spawn(async move {
-                    handle_connection(socket, addr, db_clone, stats_clone.clone(), config.port)
-                        .await;
+                    handle_connection(
+                        socket,
+                        addr,
+                        db_clone,
+                        stats_clone.clone(),
+                        config.port,
+                        moniter_clone,
+                    )
+                    .await;
                     stats_clone.decrement_connections();
                 });
             }

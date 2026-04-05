@@ -1,15 +1,32 @@
 use crate::store::{Db, Stats};
+use std::sync::Arc;
+use std::time::{SystemTime, UNIX_EPOCH};
+use tokio::sync::broadcast;
 
 pub mod hashmap;
 pub mod server;
 pub mod string;
 
-pub async fn execute_commands(parts: &[&str], db: &Db, stats: &Stats, port: u16) -> String {
+pub async fn execute_commands(
+    parts: &[&str],
+    db: &Db,
+    stats: &Stats,
+    port: u16,
+    monitor_tx: &Arc<broadcast::Sender<String>>,
+) -> String {
     let command = parts[0].to_uppercase();
     stats.increment_commands();
+
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs();
+
+    let _ = monitor_tx.send(format!("{} \"{}\"", timestamp, parts.join("\" \"")));
+
     match command.as_str() {
         // Server
-        "PING" | "ECHO" | "DBSIZE" | "INFO" | "FLUSHDB" | "TYPE" | "KEYS" => {
+        "PING" | "ECHO" | "DBSIZE" | "INFO" | "FLUSHDB" | "TYPE" | "KEYS" | "MONITER" => {
             server::handle(parts, &db, &stats, port).await
         }
         // Strings
