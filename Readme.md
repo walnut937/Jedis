@@ -10,16 +10,16 @@ There are few features which will be added in future all of them haven't been in
 - **String Operations**: `SET`, `GET`, `DEL`, `TTL`, `INCR`, `DECR`, `INCRBY`, `DECRBY`
 - **Hash Operation**: `HSET`, `HGET`, `HDEL` , `HTTL`
 - **List Operations**: <!---`LPUSH`, `RPUSH`, `LPOP`, `LRANGE`, `LLEN`, `BLPOP` --> coming soon
-- **Stream Operations**: <!--- `XADD`, `XRANGE`, `XREAD` ---> coming soon
-- **Sorted Set Operations**: <!--- `ZADD`, `ZRANGE`, `ZRANK`, `ZCARD`, `ZSCORE`, `ZREM` ---> coming soon
+- **Stream Operations**: <!---`XADD`, `XRANGE`, `XREAD` -->
+- **Sorted Set Operations**: <!---`ZADD`, `ZRANGE`, `ZRANK`, `ZCARD`, `ZSCORE`, `ZREM` --> coming soon
 - **Server Operations**: `PING`, `ECHO`, `INFO`, `CONFIG`, `KEYS`, `SAVE`, `TYPE`, `SHUTDOWN`, `MONITER`, `INFO`
-- **Pub/Sub**: <!--- `SUBSCRIBE`, `UNSUBSCRIBE`, `PUBLISH` ---> coming soon
-- **Transactions**: <!--- `MULTI`, `EXEC`, `DISCARD` ---> coming soon
+- **Pub/Sub**: <!---`SUBSCRIBE`, `UNSUBSCRIBE`, `PUBLISH` --> coming soon
+- **Transactions**: <!---`MULTI`, `EXEC`, `DISCARD` --> coming soon
 
 ### Advanced Features
-- **Master-Slave Replication**: Full replication support with `REPLCONF`, `PSYNC`
-- **RDB Persistence**: Binary file format for data persistence
-- **Blocking Operations**: Non-blocking I/O with support for blocking list operations
+<!--- **Master-Slave Replication**: Full replication support with `REPLCONF`, `PSYNC`-->
+<!--- **RDB Persistence**: Binary file format for data persistence-->
+<!--- **Blocking Operations**: Non-blocking I/O with support for blocking list operations-->
 - **Expiration Support**: TTL functionality for keys
 - **Asynchronous Architecture**: Built on Tokio for high concurrency
 
