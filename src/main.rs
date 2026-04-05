@@ -2,6 +2,7 @@ use tokio::net::TcpListener;
 mod background;
 mod commands;
 mod config;
+mod resp;
 mod server;
 mod store;
 use crate::background::expire_type;
@@ -34,8 +35,6 @@ async fn main() {
 
     println!("Server running on {}", config.port);
     println!("Waiting for connections...");
-    println!("\n\"");
-    println!("\n\"");
 
     loop {
         match listener.accept().await {
@@ -44,7 +43,6 @@ async fn main() {
                 let db_clone = db.clone();
                 let stats_clone = stats.clone();
                 let moniter_clone = moniter_tx.clone();
-                stats.increment_connections();
                 tokio::spawn(async move {
                     handle_connection(
                         socket,
@@ -55,7 +53,6 @@ async fn main() {
                         moniter_clone,
                     )
                     .await;
-                    stats_clone.decrement_connections();
                 });
             }
             Err(e) => {

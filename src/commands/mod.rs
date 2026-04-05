@@ -22,7 +22,9 @@ pub async fn execute_commands(
         .unwrap_or_default()
         .as_secs();
 
-    let _ = monitor_tx.send(format!("{} \"{}\"", timestamp, parts.join("\" \"")));
+    if command != "MONITOR" {
+        let _ = monitor_tx.send(format!("{} \"{}\"", timestamp, parts.join("\" \"")));
+    }
 
     match command.as_str() {
         // Server

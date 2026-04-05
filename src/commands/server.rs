@@ -1,43 +1,45 @@
+use crate::resp::writer;
 use crate::store::server::{data_type, flush_db, get_db_size, get_keys, server_info};
 use crate::store::{Db, Stats};
-// use std::sync::Arc;
-// use tokio::sync::broadcast;
 
-pub async fn handle(
-    parts: &[&str],
-    db: &Db,
-    stats: &Stats,
-    port: u16,
-    // mointer_tx: Arc<broadcast::Sender<String>>,
-) -> String {
-    let command = parts[0].to_uppercase();
-    match command.as_str() {
-        "PING" => "PONG\n".to_string(),
-        "ECHO" => match parts {
-            [_, msg] => format!("{}\n", msg).to_string(),
-            _ => "ERR wrong number of arguments for 'ECHO'\n".to_string(),
-        },
-        "DBSIZE" => {
-            let len = get_db_size(db).await;
-            format!("{}\n", len)
+pub async fn handle(parts: &[&str], db: &Db, stats: &Stats, port: u16) -> String {
+    match parts[0].to_uppercase().as_str() {
+        "PING" => writer::simple_string("PONG"),
+
+        "ECHO" => {
+            if parts.len() != 2 {
+                return writer::error("usage: ECHO message");
+            }
+            writer::bulk_string(parts[1])
         }
-        "FLUSHDB" => flush_db(db).await,
-        "TYPE" => match parts {
-            [_, data] => data_type(db, data).await,
-            _ => "ERR wrong number of arguments for 'TYPE'\n".to_string(),
-        },
-        "KEYS" => match parts {
-            [_, pattern] => get_keys(db, pattern).await,
-            _ => "ERR wrong number of arguments for 'KEYS'\n".to_string(),
-        },
-        "INFO" => match parts {
-            [_] => server_info(db, stats, port).await,
-            _ => "ERR wrong number of arguments for 'INFO'\n".to_string(),
-        },
-        // "MONITER" => match parts {
-        //     [_] => moniter_mode(&moniter_tx).await,
-        //     _ => "ERR wrong number of arguments for 'MONITER'".to_string(),
-        // },
-        _ => "UNKNOWN SERVER COMMAND\n".to_string(),
+
+        "DBSIZE" => writer::integer(get_db_size(db).await as i64),
+
+        "FLUSHDB" => {
+            flush_db(db).await;
+            writer::simple_string("OK")
+        }
+
+        "TYPE" => {
+            if parts.len() != 2 {
+                return writer::error("usage: TYPE key");
+            }
+            writer::simple_string(&data_type(db, parts[1]).await)
+        }
+
+        "KEYS" => {
+            if parts.len() != 2 {
+                return writer::error("usage: KEYS pattern");
+            }
+            writer::array(&get_keys(db, parts[1]).await)
+        }
+
+        "INFO" => {
+            let info_str = server_info(db, stats, port).await;
+            let lines: Vec<String> = info_str.lines().map(|l| l.to_string()).collect();
+            writer::array(&lines)
+        }
+
+        _ => writer::error("unknown server command"),
     }
 }
