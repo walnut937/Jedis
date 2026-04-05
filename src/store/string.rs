@@ -21,7 +21,7 @@ pub async fn get(db: &Db, key: &str) -> Result<Option<String>, String> {
         }
         Some(entry) => match &entry.value {
             RedisValue::String(s) => Ok(Some(s.clone())),
-            _ => Err("Wrongtype key holds a non-string value".to_string()),
+            _ => Err("WRONGTYPE key holds a non-string value".to_string()),
         },
         None => Ok(None),
     }
