@@ -7,14 +7,14 @@ There are few features which will be added in future all of them haven't been in
 ## Features
 
 ### Core Redis Commands
-- **String Operations**: `SET`, `GET`, `DEL`, `TTL`
+- **String Operations**: `SET`, `GET`, `DEL`, `TTL`, `INCR`, `DECR`, `INCRBY`, `DECRBY`
 - **Hash Operation**: `HSET`, `HGET`, `HDEL` , `HTTL`
-- **List Operations**: `LPUSH`, `RPUSH`, `LPOP`, `LRANGE`, `LLEN`, `BLPOP`
-- **Stream Operations**: `XADD`, `XRANGE`, `XREAD`
-- **Sorted Set Operations**: `ZADD`, `ZRANGE`, `ZRANK`, `ZCARD`, `ZSCORE`, `ZREM`
-- **Server Operations**: `PING`, `ECHO`, `INFO`, `CONFIG`, `KEYS`, `SAVE`, `TYPE`
-- **Pub/Sub**: `SUBSCRIBE`, `UNSUBSCRIBE`, `PUBLISH`
-- **Transactions**: `MULTI`, `EXEC`, `DISCARD`
+- **List Operations**: <!---`LPUSH`, `RPUSH`, `LPOP`, `LRANGE`, `LLEN`, `BLPOP` --> coming soon
+- **Stream Operations**: <!--- `XADD`, `XRANGE`, `XREAD` ---> coming soon
+- **Sorted Set Operations**: <!--- `ZADD`, `ZRANGE`, `ZRANK`, `ZCARD`, `ZSCORE`, `ZREM` ---> coming soon
+- **Server Operations**: `PING`, `ECHO`, `INFO`, `CONFIG`, `KEYS`, `SAVE`, `TYPE`, `SHUTDOWN`, `MONITER`, `INFO`
+- **Pub/Sub**: <!--- `SUBSCRIBE`, `UNSUBSCRIBE`, `PUBLISH` ---> coming soon
+- **Transactions**: <!--- `MULTI`, `EXEC`, `DISCARD` ---> coming soon
 
 ### Advanced Features
 - **Master-Slave Replication**: Full replication support with `REPLCONF`, `PSYNC`
@@ -30,14 +30,14 @@ There are few features which will be added in future all of them haven't been in
 - **`server.rs`**: Main entry point with TCP server and connection handling
 - **`commands/mod.rs`**: Implementation of all Redis commands
 <!--- **`utils/mod.rs`**: Utility functions, data structures, and protocol encoding/decoding-->
-- **Integration Tests**: Comprehensive test suite
+<!--- **Integration Tests**: Comprehensive test suite-->
 
 ### Data Structures
 ```rust
 pub enum RedisValue {
     String(String),
     Hash(HashMap<String, String>),
-    List(Vec<String>),
+    // List(Vec<String>),
 }
 
 pub struct Entry {

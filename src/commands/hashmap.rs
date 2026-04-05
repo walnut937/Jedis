@@ -1,15 +1,17 @@
-use crate::store::Db;
 use crate::store::hashmap;
+use crate::store::{Db, Stats};
 
-pub async fn handle(parts: &[&str], db: &Db) -> String {
-    match parts[0] {
+pub async fn handle(parts: &[&str], db: &Db, stats: &Stats) -> String {
+    let command = parts[0].to_uppercase();
+    match command.as_str() {
         "HSET" => match parts {
-            [_, key, field, value] => match hashmap::hset(db, key, field, value, None).await {
+            [_, key, field, value] => match hashmap::hset(stats, db, key, field, value, None).await
+            {
                 Ok(_) => "OK\n".to_string(),
                 Err(e) => format!("ERR {}\n", e),
             },
             [_, key, field, value, "EX", secs] => match secs.parse::<u64>() {
-                Ok(n) => match hashmap::hset(db, key, field, value, Some(n)).await {
+                Ok(n) => match hashmap::hset(stats, db, key, field, value, Some(n)).await {
                     Ok(_) => "OK\n".to_string(),
                     Err(e) => format!("ERR {}\n", e),
                 },
@@ -28,7 +30,7 @@ pub async fn handle(parts: &[&str], db: &Db) -> String {
         },
 
         "HDEL" => match parts {
-            [_, key, field] => match hashmap::hdel(db, key, field).await {
+            [_, key, field] => match hashmap::hdel(stats, db, key, field).await {
                 true => "OK\n".to_string(),
                 false => "ERR no such key/field\n".to_string(),
             },

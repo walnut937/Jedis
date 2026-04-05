@@ -1,12 +1,17 @@
 use crate::commands::execute_commands;
-use crate::store::Db;
+use crate::store::{Db, Stats};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::TcpStream;
 
-pub async fn handle_connection(socket: TcpStream, addr: std::net::SocketAddr, db: &Db) {
+pub async fn handle_connection(
+    socket: TcpStream,
+    addr: std::net::SocketAddr,
+    db: Db,
+    stats: Stats,
+    port: u16,
+) {
     let (reader, mut writer) = socket.into_split();
     let mut reader = BufReader::new(reader);
-
     let mut line = String::new();
 
     loop {
@@ -37,7 +42,7 @@ pub async fn handle_connection(socket: TcpStream, addr: std::net::SocketAddr, db
 
         println!("{} says: {:?}", addr, parts);
 
-        let response = execute_commands(&parts, db).await;
+        let response = execute_commands(&parts, &db, &stats, port).await;
 
         if let Err(e) = writer.write_all(response.as_bytes()).await {
             eprintln!("Failed to write to {}: {}", addr, e);
