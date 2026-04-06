@@ -20,6 +20,7 @@ There are few features which will be added in future all of them haven't been in
 <!--- **Master-Slave Replication**: Full replication support with `REPLCONF`, `PSYNC`-->
 <!--- **RDB Persistence**: Binary file format for data persistence-->
 <!--- **Blocking Operations**: Non-blocking I/O with support for blocking list operations-->
+- **SELF RESP CLI SUPPORT**: Have it own RESP protocol CLI
 - **Expiration Support**: TTL functionality for keys
 - **Asynchronous Architecture**: Built on Tokio for high concurrency
 
@@ -52,7 +53,7 @@ pub struct Entry {
 
 - Rust 1.90+ 
 - Tokio runtime
-- Dependencies: `rand`, `tokio`
+- Dependencies: `rand`, `tokio`, `clap`
 
 ### Installation
 
@@ -79,9 +80,9 @@ cargo build --release
 ### Command Line Options
 
 - `--port`: Port number to listen on (default: 6379)
-- `--dir`: Directory for RDB files
+<!--- `--dir`: Directory for RDB files
 - `--dbfilename`: Name of the RDB file
-- `--replicaof`: Master server address for replication (format: "host port")
+- `--replicaof`: Master server address for replication (format: "host port")-->
 
 ## Protocol Support
 
@@ -97,10 +98,12 @@ The implementation follows the Redis Serialization Protocol (RESP):
 
 The server supports master-slave replication with:
 
-- Automatic replica discovery and registration
+<!--- Automatic replica discovery and registration
 - Command propagation from master to replicas
 - Replica acknowledgment tracking
-- RDB file synchronization
+- RDB file synchronization-->
+
+COMING SOON ...
 
 ### Replication Flow
 1. Replica connects to master

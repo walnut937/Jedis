@@ -33,6 +33,6 @@ pub fn array(items: &[String]) -> String {
 }
 
 // *0\r\n  (empty array)
-pub fn _empty_array() -> String {
+pub fn empty_array() -> String {
     "*0\r\n".to_string()
 }

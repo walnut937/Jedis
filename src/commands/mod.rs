@@ -1,3 +1,4 @@
+use crate::config::SharedConfig;
 use crate::store::{Db, Stats};
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -13,6 +14,7 @@ pub async fn execute_commands(
     stats: &Stats,
     port: u16,
     monitor_tx: &Arc<broadcast::Sender<String>>,
+    config: &SharedConfig,
 ) -> String {
     let command = parts[0].to_uppercase();
     stats.increment_commands();
@@ -29,7 +31,7 @@ pub async fn execute_commands(
     match command.as_str() {
         // Server
         "PING" | "ECHO" | "DBSIZE" | "INFO" | "FLUSHDB" | "TYPE" | "KEYS" | "MONITER" => {
-            server::handle(parts, &db, &stats, port).await
+            server::handle(parts, &db, &stats, port, config).await
         }
         // Strings
         "SET" | "GET" | "DEL" | "EXISTS" | "TTL" | "INCR" | "DECR" | "INCRBY" | "DECRBY" => {
