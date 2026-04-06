@@ -30,9 +30,8 @@ pub async fn execute_commands(
 
     match command.as_str() {
         // Server
-        "PING" | "ECHO" | "DBSIZE" | "INFO" | "FLUSHDB" | "TYPE" | "KEYS" | "MONITER" => {
-            server::handle(parts, &db, &stats, port, config).await
-        }
+        "PING" | "ECHO" | "DBSIZE" | "INFO" | "FLUSHDB" | "TYPE" | "KEYS" | "MONITER"
+        | "CONFIG" => server::handle(parts, &db, &stats, port, config).await,
         // Strings
         "SET" | "GET" | "DEL" | "EXISTS" | "TTL" | "INCR" | "DECR" | "INCRBY" | "DECRBY" => {
             string::handle(parts, &db, &stats).await

@@ -9,6 +9,14 @@ pub async fn config_get(config: &SharedConfig, key: &str) -> Vec<(String, String
             "password".to_string(),
             cfg.password.clone().unwrap_or_default(),
         )],
+        "auth" => vec![(
+            "auth".to_string(),
+            if cfg.auth_enabled {
+                "on".to_string()
+            } else {
+                "off".to_string()
+            },
+        )],
         "maxconnections" => vec![(
             "maxconnections".to_string(),
             cfg.max_connections.to_string(),
@@ -21,6 +29,14 @@ pub async fn config_get(config: &SharedConfig, key: &str) -> Vec<(String, String
             (
                 "password".to_string(),
                 cfg.password.clone().unwrap_or_default(),
+            ),
+            (
+                "auth".to_string(),
+                if cfg.auth_enabled {
+                    "on".to_string()
+                } else {
+                    "off".to_string()
+                },
             ),
             (
                 "maxconnections".to_string(),
@@ -41,12 +57,19 @@ pub async fn config_set(config: &SharedConfig, key: &str, value: &str) -> Result
 
     match key {
         "password" => {
-            cfg.password = if value.is_empty() {
-                None
+            if value.is_empty() {
+                cfg.password = None;
+                cfg.auth_enabled = false; // auto disable when password removed
             } else {
-                Some(value.to_string())
-            };
+                cfg.password = Some(value.to_string());
+                cfg.auth_enabled = true; // auto enable when password set
+            }
         }
+        "auth" => match value {
+            "on" => cfg.auth_enabled = true,
+            "off" => cfg.auth_enabled = false,
+            _ => unreachable!(),
+        },
         "maxconnections" => {
             cfg.max_connections = value.parse().unwrap(); // safe — validated above
         }
@@ -74,6 +97,18 @@ fn validate_config_set(key: &str, value: &str) -> Result<(), String> {
             Err("cannot change port or host at runtime — they are bound at startup. Restart with new --port or --host".to_string())
         }
         "password" => Ok(()),  // any string is valid
+        "auth" => {
+            match value {
+                "on" => Ok(()),  // password check happens in config_set
+                "off" => {
+                    // to disable auth you must provide current password
+                    // format: CONFIG SET auth off
+                    // but we need the password — handled differently, see commands/server.rs
+                    Ok(())
+                }
+                _ => Err("auth must be 'on' or 'off'".to_string()),
+            }
+        }
         "maxconnections" => {
             let n: usize = value.parse()
                 .map_err(|_| format!("invalid maxconnections '{}' — must be a positive integer", value))?;

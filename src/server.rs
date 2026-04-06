@@ -1,6 +1,7 @@
 use crate::commands::execute_commands;
 use crate::config::SharedConfig;
 use crate::resp::parser::parse_command;
+use crate::resp::writer;
 use crate::store::{Db, Stats};
 use std::sync::Arc;
 use std::sync::atomic::Ordering;
@@ -23,7 +24,6 @@ pub async fn handle_connection(
     {
         let cfg = config.read().await;
         let current = stats.connected_clients.load(Ordering::Relaxed);
-
         if current > cfg.max_connections {
             let (_, mut writer) = socket.into_split();
             let _ = writer.write_all(b"-ERR max connections reached\r\n").await;
@@ -34,6 +34,12 @@ pub async fn handle_connection(
 
     let (reader, mut writer) = socket.into_split();
     let mut reader = BufReader::new(reader);
+
+    // check auth requirement at connection time
+    let mut authenticated = {
+        let cfg = config.read().await;
+        !cfg.auth_enabled // if auth off → already authenticated
+    };
 
     loop {
         let parts = match parse_command(&mut reader).await {
@@ -46,7 +52,6 @@ pub async fn handle_connection(
 
         let parts_str: Vec<&str> = parts.iter().map(|s| s.as_str()).collect();
 
-        // logging based on config
         {
             let cfg = config.read().await;
             if cfg.loglevel == "debug" {
@@ -54,7 +59,29 @@ pub async fn handle_connection(
             }
         }
 
-        if parts_str[0].eq_ignore_ascii_case("MONITOR") {
+        let command = parts_str[0].to_uppercase();
+
+        // AUTH — always allowed
+        if command == "AUTH" {
+            let response = handle_auth(&parts_str, &config, &mut authenticated).await;
+            writer.write_all(response.as_bytes()).await.ok();
+            continue;
+        }
+
+        // PING — allowed without auth so clients can check server is alive
+        if command == "PING" && !authenticated {
+            writer.write_all(b"+PONG\r\n").await.ok();
+            continue;
+        }
+
+        // block everything else if not authenticated
+        if !authenticated {
+            let response = writer::error("NOAUTH Authentication required — use AUTH password");
+            writer.write_all(response.as_bytes()).await.ok();
+            continue;
+        }
+
+        if command == "MONITOR" {
             writer.write_all(b"+OK\r\n").await.ok();
             run_monitor(&mut writer, &monitor_tx).await;
             println!("client {} left monitor mode", addr);
@@ -73,6 +100,34 @@ pub async fn handle_connection(
     println!("client {} fully disconnected", addr);
 }
 
+async fn handle_auth(parts: &[&str], config: &SharedConfig, authenticated: &mut bool) -> String {
+    if parts.len() != 2 {
+        return writer::error("usage: AUTH password");
+    }
+
+    let cfg = config.read().await;
+
+    if !cfg.auth_enabled {
+        // auth is off — AUTH command succeeds trivially
+        *authenticated = true;
+        return writer::simple_string("OK");
+    }
+
+    match &cfg.password {
+        None => {
+            *authenticated = true;
+            writer::simple_string("OK")
+        }
+        Some(expected) => {
+            if parts[1] == expected {
+                *authenticated = true;
+                writer::simple_string("OK")
+            } else {
+                writer::error("WRONGPASS invalid password")
+            }
+        }
+    }
+}
 async fn run_monitor(
     writer: &mut tokio::net::tcp::OwnedWriteHalf,
     monitor_tx: &Arc<broadcast::Sender<String>>,

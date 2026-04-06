@@ -40,6 +40,7 @@ pub struct Config {
 
     // can change at runtime via CONFIG SET
     pub password: Option<String>,
+    pub auth_enabled: bool,
     pub max_connections: usize,
     pub loglevel: String,
     pub monitor_buffer: usize,
@@ -75,6 +76,7 @@ impl Config {
 
             // these can change — CLI wins over conf file
             password: cli.password.or(from_conf.password),
+            auth_enabled: from_conf.auth_enabled.unwrap_or(false),
             max_connections: if cli.max_connections != 100 {
                 cli.max_connections // user explicitly set it
             } else {
@@ -105,12 +107,14 @@ impl Config {
              host {}\n\
              port {}\n\
              password {}\n\
+             auth {}\n\
              maxconnections {}\n\
              loglevel {}\n\
              monitor_buffer {}\n",
             self.host,
             self.port,
             self.password.as_deref().unwrap_or(""),
+            if self.auth_enabled { "on" } else { "off" },
             self.max_connections,
             self.loglevel,
             self.monitor_buffer,
@@ -129,6 +133,7 @@ pub fn create_shared_config(config: Config) -> SharedConfig {
 #[derive(Default)]
 struct ConfFile {
     password: Option<String>,
+    auth_enabled: Option<bool>,
     max_connections: Option<usize>,
     loglevel: Option<String>,
     monitor_buffer: Option<usize>,
@@ -159,6 +164,18 @@ impl ConfFile {
                     } else {
                         Some(val.to_string())
                     };
+                }
+                "auth" => {
+                    cf.auth_enabled = Some(match val {
+                        "on" => true,
+                        "off" => false,
+                        _ => {
+                            return Err(format!(
+                                "invalid auth value '{}' -- must be on or off",
+                                val
+                            ));
+                        }
+                    });
                 }
                 "maxconnections" => {
                     cf.max_connections = Some(
